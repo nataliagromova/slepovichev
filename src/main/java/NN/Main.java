@@ -1,19 +1,40 @@
-package newp;
-
-import javafx.util.Pair;
+package NN;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
 import java.util.*;
 
-/**
- * Created by NATA on 04.10.2018.
- */
 public class Main {
-    public static void main(String[] args) throws Exception {
+    static Scanner scanner = new Scanner(System.in);
 
-        Graph graph = (ReadFile("1.txt"));
+    public static void main(String[] args) throws Exception {
+        System.out.println("1: Создание графа\n" +
+                "2: Создание функции по графу \n"
+                );
+
+        while (true) {
+            int n = Integer.parseInt(scanner.nextLine());
+            switch (n) {
+                case 1:
+                    Step1();
+                    break;
+                case 2:
+                    Step2();
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+
+    }
+
+    public static void Step1() throws Exception {
+        System.out.println("Введите имя файла с описанием графа без .txt :");
+        String name = scanner.nextLine();
+        Graph graph = (ReadFile(name + ".txt"));
         XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("firstSerialization.xml")));
         encoder.writeObject(graph);
         encoder.close();
@@ -22,6 +43,22 @@ public class Main {
         Graph graph1 = (Graph) decoder.readObject();
         graph1.writeGraph("firstSerializationOutput.txt");
         decoder.close();
+        System.out.println("Результат десериализации в файле firstSerializationOutput.txt");
+    }
+
+    public static void Step2() throws Exception {
+        System.out.print("Текстовый файл c ориентированным ациклическим графом с именованными вершинами и линейно упорядоченными дугами: ");
+        String nameFile = scanner.nextLine();
+        Graph graph = ReadFile(nameFile);
+//        graph.sortGraph();
+        GraphDfs functionsGeneratorOfGraph = new GraphDfs(graph);
+        String result = functionsGeneratorOfGraph.generateFunction();
+        try (PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream("secondOutput.txt")))) {
+            out.println(result);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        System.out.println("Результат преобразования графа в имя функции в файле secondOutput.txt");
     }
 
     static Graph ReadFile(String nameFile) throws Exception {
@@ -41,6 +78,8 @@ public class Main {
             int node2 = Integer.parseInt(m[0]);
             int node3 = Integer.parseInt(m[2]);
             Node nodeWithEdge = new Node(node2, node3);
+            if (!graph.containsKey(node2))
+                graph.put(node2, new ArrayList<>());
             if (!graph.containsKey(node1)) {
                 graph.put(node1, new ArrayList<>());
                 graph.get(node1).add(nodeWithEdge);

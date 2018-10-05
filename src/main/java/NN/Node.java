@@ -1,4 +1,4 @@
-package newp;
+package NN;
 
 /**
  * Created by NATA on 04.10.2018.
@@ -25,10 +25,7 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "node1= " + node1 +
-                ", node2= " + node2 +
-                '}';
+        return node1+" "+node2;
     }
 
     public int getNode2() {
